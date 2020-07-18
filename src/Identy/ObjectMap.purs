@@ -33,49 +33,48 @@ derive newtype instance monoidObjectMap :: (Semigroup v) => Monoid (ObjectMap k 
 derive newtype instance functorObjectMap :: Functor (ObjectMap k)
 derive newtype instance foldableObjectMap :: Foldable (ObjectMap k)
 derive newtype instance traversableObjectMap :: Traversable (ObjectMap k)
-derive instance newtypeObjectMap :: Newtype (ObjectMap k v) _
 
 instance readForeignObjectMap :: (Newtype k String, ReadForeign v) => ReadForeign (ObjectMap k v) where
-  readImpl x = wrap <$> readImpl x
+  readImpl obj = ObjectMap <$> readImpl obj
 
 instance writeForeignObjectMap :: (Newtype k String, WriteForeign v) => WriteForeign (ObjectMap k v) where
-  writeImpl = unwrap >>> writeImpl
+  writeImpl (ObjectMap obj) = writeImpl obj
 
 keys :: forall k v. Newtype k String => ObjectMap k v -> Array k
-keys x = wrap <$> (Object.keys $ unwrap x)
+keys (ObjectMap obj) = wrap <$> (Object.keys obj)
 
 values :: forall k v. ObjectMap k v -> Array v
-values = unwrap >>> Object.values
+values (ObjectMap obj) = Object.values obj
 
 update :: forall k v. Newtype k String => (v -> Maybe v) -> k -> ObjectMap k v -> ObjectMap k v
-update f k = unwrap >>> Object.update f (unwrap k) >>> wrap
+update f k (ObjectMap obj) = ObjectMap $ Object.update f (unwrap k) obj
 
 union :: forall k v. ObjectMap k v -> ObjectMap k v -> ObjectMap k v
-union x = unwrap >>> Object.union (unwrap x) >>> wrap
+union (ObjectMap lhs) (ObjectMap rhs) = ObjectMap $ Object.union lhs rhs
 
 size :: forall k v. ObjectMap k v -> Int
-size = unwrap >>> Object.size
+size (ObjectMap obj) = Object.size obj
 
 singleton :: forall k v. Newtype k String => k -> v -> ObjectMap k v
-singleton k v = wrap $ Object.singleton (unwrap k) v
+singleton k v = ObjectMap $ Object.singleton (unwrap k) v
 
 member :: forall k v. Newtype k String => k -> ObjectMap k v -> Boolean
-member k = unwrap >>> Object.member (unwrap k)
+member k (ObjectMap obj) = Object.member (unwrap k) obj
 
 lookup :: forall k v. Newtype k String => k -> ObjectMap k v -> Maybe v
-lookup k = unwrap >>> Object.lookup (unwrap k)
+lookup k (ObjectMap obj) = Object.lookup (unwrap k) obj
 
 isEmpty :: forall k v. ObjectMap k v -> Boolean
-isEmpty = unwrap >>> Object.isEmpty
+isEmpty (ObjectMap obj) = Object.isEmpty obj
 
 insert :: forall k v. Newtype k String => k -> v -> ObjectMap k v -> ObjectMap k v
-insert k v = unwrap >>> Object.insert (unwrap k) v >>> wrap
+insert k v (ObjectMap obj) = ObjectMap $ Object.insert (unwrap k) v obj
 
 empty :: forall k v. ObjectMap k v
-empty = wrap Object.empty
+empty = ObjectMap Object.empty
 
 delete :: forall k v. Newtype k String => k -> ObjectMap k v -> ObjectMap k v
-delete k = unwrap >>> Object.delete (unwrap k) >>> wrap
+delete k (ObjectMap obj) = ObjectMap $ Object.delete (unwrap k) obj
 
 alter :: forall k v. Newtype k String => (Maybe v -> Maybe v) -> k -> ObjectMap k v -> ObjectMap k v
-alter f k = unwrap >>> Object.alter f (unwrap k) >>> wrap
+alter f k (ObjectMap obj) = ObjectMap $ Object.alter f (unwrap k) obj
